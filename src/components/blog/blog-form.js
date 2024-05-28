@@ -13,7 +13,9 @@ export default class BlogForm extends Component {
       title: "",
       blog_status: "",
       content: "",
-      featured_image: ""
+      featured_image_url: "",
+      apiUrl: "https://rosafraile.devcamp.space/portfolio/portfolio_blogs",
+      apiAction: "post"
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -31,23 +33,32 @@ export default class BlogForm extends Component {
 
   deleteImage(imageType) {
     axios
-      .delete(`https://api.devcamp.space/portfolio/delete-portfolio-blog-image/${this.props.blogToEdit.id}?image_type=${imageType}`,
-      { withCredentials: true }
-    ).then(response => {
-      // TODO
-      console.log("response blog image delete", response);
-    }). catch(error => {
-      console.log("deleteImage error", error);
-    });
+      .delete(
+        `https://api.devcamp.space/portfolio/delete-portfolio-blog-image/${
+          this.props.blog.id
+        }?image_type=${imageType}`,
+        { withCredentials: true }
+      )
+      .then(response => {
+        this.props.handleFeaturedImageDelete();
+      })
+      .catch(error => {
+        console.log("deleteImage error", error);
+      });
   }
 
-  componentDidMount() {
+  componentWillMount() {
     if (this.props.editMode) {
       this.setState({
-        id: this.props.blogToEdit.id,
-        title: this.props.blogToEdit.title,
-        blog_status: this.props.blogToEdit.blog_status
-      })
+        id: this.props.blog.id,
+        title: this.props.blog.title,
+        blog_status: this.props.blog.blog_status,
+        content: this.props.blog.content,
+        apiUrl: `https://rosafraile.devcamp.space/portfolio/portfolio_blogs/${
+          this.props.blog.id
+        }`,
+        apiAction: "patch"
+      });
     }
   }
 
@@ -68,7 +79,7 @@ export default class BlogForm extends Component {
 
   handleFeaturedImageDrop() {
     return {
-      addedfile: file => this.setState({ featured_image: file })
+      addedfile: file => this.setState({ featured_image_url: file })
     };
   }
 
@@ -83,10 +94,10 @@ export default class BlogForm extends Component {
     formData.append("portfolio_blog[blog_status]", this.state.blog_status);
     formData.append("portfolio_blog[content]", this.state.content);
 
-    if (this.state.featured_image) {
+    if (this.state.featured_image_url) {
       formData.append(
         "portfolio_blog[featured_image]",
-        this.state.featured_image
+        this.state.featured_image_url
       );
     }
 
@@ -94,14 +105,14 @@ export default class BlogForm extends Component {
   }
 
   handleSubmit(event) {
-    axios
-      .post(
-        "https://rosafraile.devcamp.space/portfolio/portfolio_blogs",
-        this.buildForm(),
-        { withCredentials: true }
-      )
+    axios({
+      method: this.state.apiAction,
+      url: this.state.apiUrl,
+      data: this.buildForm(),
+      withCredentials: true
+    })
       .then(response => {
-        if (this.state.featured_image) {
+        if (this.state.featured_image_url) {
           this.featuredImageRef.current.dropzone.removeAllFiles();
         }
 
@@ -109,12 +120,16 @@ export default class BlogForm extends Component {
           title: "",
           blog_status: "",
           content: "",
-          featured_image: ""
+          featured_image_url: "",
+          apiUrl: "https://rosafraile.devcamp.space/portfolio/portfolio_blogs",
+          apiAction: "post"
         });
 
-        this.props.handleSuccessfulFormSubmission(
-          response.data.portfolio_blog
-        );
+        if (this.props.editMode) {
+          this.props.handleUpdateFormSubmission(response.data.portfolio_blog);
+        } else {
+          this.props.handleSuccessfulFormSubmission(response.data.portfolio_blog);
+        }
       })
       .catch(error => {
         console.log("handleSubmit for blog error", error);
@@ -155,23 +170,25 @@ export default class BlogForm extends Component {
             handleRichTextEditorChange={this.handleRichTextEditorChange}
             editMode={this.props.editMode}
             contentToEdit={
-              this.props.editMode && this.props.blogToEdit.content ? this.props.blogToEdit.content : null
+              this.props.editMode && this.props.blog.content
+                ? this.props.blog.content
+                : null
             }
           />
         </div>
 
         <div className="image-uploaders">
-          {this.props.editMode && this.props.blogToEdit.featured_image_url ? (
-            <div className='portfolio-manager-image-wrapper'>
-              <img src={this.props.blogToEdit.featured_image_url} />
+          {this.props.editMode && this.props.blog.featured_image_url ? (
+            <div className="portfolio-manager-image-wrapper">
+              <img src={this.props.blog.featured_image_url} />
 
-              <div className='image-removal-link'>
+              <div className="image-removal-link">
                 <a onClick={() => this.deleteImage("featured_image")}>
                   Remove file
                 </a>
               </div>
             </div>
-          ):(
+          ) : (
             <DropzoneComponent
               ref={this.featuredImageRef}
               config={this.componentConfig()}

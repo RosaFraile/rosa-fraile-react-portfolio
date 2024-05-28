@@ -3,15 +3,11 @@ import { Link } from "react-router-dom";
 import striptags from "striptags";
 import Truncate from "react-truncate";
 
-import BlogFeaturedImage from "./blog-featured-image";
-
 const BlogItem = props => {
     const {
         id,
-        blog_status,
         content,
         title,
-        featured_image_url
     } = props.blogItem;
 
     return(

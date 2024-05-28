@@ -26,6 +26,7 @@ class Blog extends Component {
   }
 
   handleSuccessfulNewBlogSubmission(blog) {
+    debugger;
     this.setState({
       blogModalIsOpen: false,
       blogItems: [blog].concat(this.state.blogItems)
@@ -66,13 +67,13 @@ class Blog extends Component {
     axios.get(`https://rosafraile.devcamp.space/portfolio/portfolio_blogs?page=${this.state.currentPage}`, {
         withCredentials: true
       }).then(response => {
-      this.setState({
+        this.setState({
         blogItems: this.state.blogItems.concat(response.data.portfolio_blogs),
         totalCount: response.data.meta.total_records,
         isLoading: false
-      })
-    }).catch(error => {
-      console.log("getBlogItems error", error);
+        })
+      }).catch(error => {
+        console.log("getBlogItems error", error);
     })
   }
 
