@@ -1,0 +1,11 @@
+# Exported from Render on 2024-05-30T21:27:09Z
+services:
+- type: web
+  name: rosa-fraile-react-portfolio
+  runtime: node
+  repo: https://github.com/RosaFraile/rosa-fraile-react-portfolio
+  plan: free
+  region: oregon
+  buildCommand: npm install; npm run build
+  startCommand: npm run start
+version: "1"
