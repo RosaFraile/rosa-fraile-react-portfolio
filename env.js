@@ -3,7 +3,7 @@ module.exports = {
     host: '0.0.0.0',
     disableHostCheck: true,
     allowedHosts: [
-      'https://rosa-fraile-react-portfolio.onrender.com'
+      '.onrender.com'
     ],
     port: '3000'
   }
