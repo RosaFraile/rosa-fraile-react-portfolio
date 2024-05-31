@@ -4,7 +4,7 @@
   "description": "Personal portfoilo app built in React",
   "scripts": {
     "preinstall": "npm set audit false",
-    "start": "HOST=0.0.0.0 start",
+    "start": "HOST=0.0.0.0 node app.js",
     "build": "cross-env NODE_ENV=production webpack --config webpack/prod.config.js --progress --display-error-details --color",
     "heroku-postbuild": "npm run build",
     "precommit": "eslint src",
